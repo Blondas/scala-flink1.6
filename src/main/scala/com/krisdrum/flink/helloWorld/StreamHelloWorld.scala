@@ -5,10 +5,10 @@ import org.apache.flink.streaming.api.scala._
 
 
 object StreamHelloWorld extends App with FlinkSource {
-  val collectionSource = envStr.fromCollection(seq)
+  val collectionSource = senv.fromCollection(seq)
   collectionSource.print()
 
   fileStreamSource.print()
 
-  envStr.execute()
+  senv.execute()
 }

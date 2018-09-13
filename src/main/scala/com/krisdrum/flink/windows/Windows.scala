@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.scala.DataStream
 import org.apache.flink.streaming.api.windowing.assigners.{GlobalWindows, ProcessingTimeSessionWindows, SlidingEventTimeWindows, TumblingEventTimeWindows}
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.flink.streaming.api.windowing.triggers.CountTrigger
 
 object Windows extends FlinkSource with App {
   val data = fileStreamSource.flatMap(_.split("\\W+")).map(_ -> 1)
@@ -19,9 +20,10 @@ object Windows extends FlinkSource with App {
   data
     .keyBy(0)
     .window(GlobalWindows.create)
+    .trigger(CountTrigger.of(5))
     .sum(1) // window function
     .print()
-  envStr.execute()
+  senv.execute()
 
   // 2. tumbling window - non overlaping:
   data
@@ -29,21 +31,21 @@ object Windows extends FlinkSource with App {
     .window(TumblingEventTimeWindows.of(seconds(1)))
     .sum(1) // window function
     .print()
-  envStr.execute()
-
-  // 2. sliding window:
-  data
-    .keyBy(0)
-    .window(SlidingEventTimeWindows.of(seconds(10), seconds(5)))
-    .sum(1) // window function
-    .print()
-  envStr.execute()
-
-  // 2. session window - starts at individual point, ends after period of inactivity:
-  data
-    .keyBy(0)
-    .window(ProcessingTimeSessionWindows.withGap(seconds(2)))
-    .sum(1) // window function
-    .print()
-  envStr.execute()
+  senv.execute()
+//
+//  // 2. sliding window:
+//  data
+//    .keyBy(0)
+//    .window(SlidingEventTimeWindows.of(seconds(10), seconds(5)))
+//    .sum(1) // window function
+//    .print()
+//  envStr.execute()
+//
+//  // 2. session window - starts at individual point, ends after period of inactivity:
+//  data
+//    .keyBy(0)
+//    .window(ProcessingTimeSessionWindows.withGap(seconds(2)))
+//    .sum(1) // window function
+//    .print()
+//  envStr.execute()
 }
